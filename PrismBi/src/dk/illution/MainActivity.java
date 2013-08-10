@@ -6,16 +6,12 @@ import com.google.gson.Gson;
 
 import android.widget.Button;
 import android.widget.EditText;
-import android.app.ListActivity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
