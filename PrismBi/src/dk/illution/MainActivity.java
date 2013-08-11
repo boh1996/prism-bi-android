@@ -268,12 +268,12 @@ public class MainActivity extends Activity {
 
                     String type = cursor.getString(cursor.getColumnIndex("m_type"));
                     mms.type = type;
-                    if ( type == "128" ) {
+                    if ( type.equals("128") ) {
                         mms.sender = ownersPhone.getText().toString().replace("+45","").replace(" ", "").replace("-", "");
-                        mms.recipient = getAddressNumber(id).replace("+45","").replace(" ", "").replace("-", "");;
+                        mms.recipient = getAddressNumber(id).replace("+45","").replace(" ", "").replace("-", "");
                     } else {
                         mms.recipient = ownersPhone.getText().toString().replace("+45","").replace(" ", "").replace("-", "");
-                        mms.sender = getAddressNumber(id).replace("+45","").replace(" ", "").replace("-", "");;
+                        mms.sender = getAddressNumber(id).replace("+45","").replace(" ", "").replace("-", "");
                     }
 
                     try {
@@ -322,7 +322,6 @@ public class MainActivity extends Activity {
         messageList.addAll(fetchSMS());
         messageList.addAll(fetchMMS());
 
-        Log.d("PRISM", "SENDING");
         new Send().execute(new Gson().toJson(new Data(messageList)), "sms");
     }
 
