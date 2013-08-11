@@ -1,5 +1,8 @@
 package dk.illution.data;
 
+import java.util.List;
+import dk.illution.data.MediaObject;
+
 public class SMSData {
 
 	public String message;
@@ -15,5 +18,7 @@ public class SMSData {
     public String subject;
 
     public String type;
+
+    public List<MediaObject> attachments;
 	
 }
