@@ -38,12 +38,16 @@ public class MainActivity extends Activity {
                     temp = reader.readLine();
                 }
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            Log.e("PRISM", "STRING-READER", e);
+        }
         finally {
             if (is != null) {
                 try {
                     is.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                    Log.e("PRISM", "STRING-READER", e);
+                }
             }
         }
         return sb.toString();
@@ -226,6 +230,8 @@ public class MainActivity extends Activity {
                 }
             } while (cPart.moveToNext());
         }
+
+        cPart.close();
 
         return media;
     }
