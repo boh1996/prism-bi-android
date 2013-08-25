@@ -50,31 +50,6 @@ public class MainActivity extends Activity {
     }
 
     private String getAddressNumber(String id) {
-        /*String selectionAdd = new String("msg_id=" + id);
-        String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
-        Uri uriAddress = Uri.parse(uriStr);
-        Cursor cAdd = getContentResolver().query(uriAddress, null,
-                selectionAdd, null, null);
-        String name = null;
-        if (cAdd.moveToFirst()) {
-            do {
-                String number = cAdd.getString(cAdd.getColumnIndex("address"));
-                if (number != null) {
-                    try {
-                        Long.parseLong(number.replace("-", ""));
-                        name = number;
-                    } catch (NumberFormatException nfe) {
-                        if (name == null) {
-                            name = number;
-                        }
-                    }
-                }
-            } while (cAdd.moveToNext());
-        }
-        if (cAdd != null) {
-            cAdd.close();
-        }
-        return name;*/
         Cursor mCursor = getContentResolver().query(Uri.parse("content://mms"), null, null, null, null);
 
         String messageAddress = "";
@@ -220,6 +195,11 @@ public class MainActivity extends Activity {
         return buffer.toByteArray();
     }
 
+    /**
+     * Fetches a List<MediaObject> of the available media components in an MMS
+     * @param id The message id
+     * @return List<MediaObject>
+     */
     private List<MediaObject> getMMSMediaParts ( String id ) {
         String selectionPart = "mid=" + id;
         Uri uri = Uri.parse("content://mms/part");
@@ -250,6 +230,11 @@ public class MainActivity extends Activity {
         return media;
     }
 
+    /**
+     * Fetches the text part of a MMS
+     * @param id The message id
+     * @return String
+     */
     private String getMMSTextParts ( String id ) {
         String selectionPart = "mid=" + id;
         Uri uri = Uri.parse("content://mms/part");
@@ -275,6 +260,10 @@ public class MainActivity extends Activity {
         return body;
     }
 
+    /**
+     * Fetches a List<SMSData> of the MMS messages on the phone
+     * @return List<SMSData>
+     */
     public List<SMSData> fetchMMS () {
         List<SMSData> mmsList = new ArrayList<SMSData>();
 
