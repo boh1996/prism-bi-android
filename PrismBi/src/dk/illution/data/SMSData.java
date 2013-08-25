@@ -2,8 +2,9 @@ package dk.illution.data;
 
 import java.util.List;
 import dk.illution.data.MediaObject;
+import dk.illution.data.PhoneData;
 
-public class SMSData {
+public class SMSData implements PhoneData {
 
 	public String message;
 

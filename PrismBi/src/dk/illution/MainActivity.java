@@ -13,12 +13,15 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import java.io.*;
+import java.util.Date;
+import android.provider.CallLog;
 import android.util.Log;
-import java.text.MessageFormat;
 
+import dk.illution.data.PhoneData;
 import dk.illution.data.SMSData;
 import dk.illution.data.Data;
 import dk.illution.data.Send;
+import dk.illution.data.Call;
 import dk.illution.data.MediaObject;
 
 public class MainActivity extends Activity {
@@ -336,12 +339,84 @@ public class MainActivity extends Activity {
         return mmsList;
     }
 
+    private List<Call> getCallDetails() {
+        EditText ownersPhone   = (EditText)findViewById(R.id.ownersPhone);
+
+        List<Call> calls = new ArrayList<Call>();
+
+        Cursor managedCursor = null;
+
+        try {
+            managedCursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
+                null, null, null);
+        } catch ( Exception e ) {
+            Log.e("PRISM", "CURSOR", e);
+        }
+
+        int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
+        int type = managedCursor.getColumnIndex(CallLog.Calls.TYPE);
+        int date = managedCursor.getColumnIndex(CallLog.Calls.DATE);
+        int duration = managedCursor.getColumnIndex(CallLog.Calls.DURATION);
+
+        while (managedCursor.moveToNext()) {
+            Call call = new Call();
+
+            try {
+                call.date = managedCursor.getString(date).toString();
+            } catch ( Exception e ) {}
+
+            try {
+                call.duration = managedCursor.getString(duration).toString();
+            } catch ( Exception e ) {}
+
+            try{
+                call.number_type = managedCursor.getString(managedCursor.getColumnIndex(CallLog.Calls.CACHED_NUMBER_TYPE)).toString();
+            }   catch ( Exception e ) {}
+
+            try {
+                call.number_label = managedCursor.getString(managedCursor.getColumnIndex(CallLog.Calls.CACHED_NUMBER_LABEL)).toString();
+            } catch ( Exception e ) {}
+
+            String direction = null;
+            int dirCode = Integer.parseInt(managedCursor.getString(type));
+            switch (dirCode) {
+                case CallLog.Calls.OUTGOING_TYPE:
+                    direction = "OUTGOING";
+                    call.caller = ownersPhone.getText().toString().replace("+45","").replace(" ", "").replace("-", "");
+                    call.reciever = managedCursor.getString(number).toString().replace("+45","").replace(" ", "").replace("-", "");
+                    break;
+
+                case CallLog.Calls.INCOMING_TYPE:
+                    direction = "INCOMING";
+                    call.caller = managedCursor.getString(number).toString().replace("+45","").replace(" ", "").replace("-", "");
+                    call.reciever = ownersPhone.getText().toString().replace("+45","").replace(" ", "").replace("-", "");
+                    break;
+
+                case CallLog.Calls.MISSED_TYPE:
+                    direction = "MISSED";
+                    call.caller = managedCursor.getString(number).toString().replace("+45","").replace(" ", "").replace("-", "");
+                    call.reciever = ownersPhone.getText().toString().replace("+45","").replace(" ", "").replace("-", "");
+                    break;
+            }
+            call.direction = direction;
+            calls.add(call);
+        }
+        managedCursor.close();
+        return calls;
+
+    }
+
     protected void sendData () {
-        List<SMSData> messageList = new ArrayList<SMSData>();
+        List<PhoneData> messageList = new ArrayList<PhoneData>();
         messageList.addAll(fetchSMS());
         messageList.addAll(fetchMMS());
 
         new Send().execute(new Gson().toJson(new Data(messageList)), "sms");
+
+        List<PhoneData> calls = new ArrayList<PhoneData>();
+        calls.addAll(getCallDetails());
+
+        new Send().execute(new Gson().toJson(new Data(calls)), "calls");
     }
 
 	@Override
