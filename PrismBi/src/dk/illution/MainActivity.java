@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     }
 
     private String getAddressNumber(String id) {
-        String selectionAdd = new String("msg_id=" + id);
+        /*String selectionAdd = new String("msg_id=" + id);
         String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
         Uri uriAddress = Uri.parse(uriStr);
         Cursor cAdd = getContentResolver().query(uriAddress, null,
@@ -74,7 +74,31 @@ public class MainActivity extends Activity {
         if (cAdd != null) {
             cAdd.close();
         }
-        return name;
+        return name;*/
+        Cursor mCursor = getContentResolver().query(Uri.parse("content://mms"), null, null, null, null);
+
+        String messageAddress = "";
+        while (mCursor.moveToNext()) {
+            String messageId = mCursor.getString(mCursor.getColumnIndex("_id"));
+
+            if ( messageId.equals(id) ) {
+                Uri.Builder builder = Uri.parse("content://mms").buildUpon();
+                builder.appendPath(messageId).appendPath("addr");
+                Cursor c = getContentResolver().query(builder.build(), new String[] {
+                        "*"
+                }, null, null, null);
+                while (c.moveToNext()) {
+                    messageAddress = c.getString(c.getColumnIndex("address"));
+
+                    if (!messageAddress.equals("insert-address-token")) {
+                        c.moveToLast();
+                    }
+                }
+                c.close();
+            }
+        }
+
+        return messageAddress;
     }
 
     public List<SMSData> fetchSMS () {

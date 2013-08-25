@@ -21,7 +21,7 @@ public class Send extends AsyncTask<String, Void, String> {
         entity.setContentType("application/json");
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://192.168.1.103/post.php");//+params[1]
+        HttpPost httppost = new HttpPost("http://192.168.1.101/post.php");//+params[1]
 
         try {
             // Add your data
