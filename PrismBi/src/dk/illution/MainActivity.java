@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.Gson;
 
+import android.content.SharedPreferences;
 import android.widget.Button;
 import android.widget.EditText;
 import android.database.Cursor;
@@ -13,7 +14,11 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import java.io.*;
+import java.util.TreeSet;
 import java.util.Date;
+import java.util.Set;
+import java.util.SortedSet;
+
 import android.provider.CallLog;
 import android.util.Log;
 
@@ -25,6 +30,8 @@ import dk.illution.data.Call;
 import dk.illution.data.MediaObject;
 
 public class MainActivity extends Activity {
+
+    public static final String PREFS_NAME = "PrismBI";
 
     private String getMmsText(String id) {
         Uri partURI = Uri.parse("content://mms/part/" + id);
@@ -406,17 +413,23 @@ public class MainActivity extends Activity {
 
     }
 
-    protected void sendData () {
+    protected void sendData (String apiUrl) {
         List<PhoneData> messageList = new ArrayList<PhoneData>();
         messageList.addAll(fetchSMS());
         messageList.addAll(fetchMMS());
 
-        new Send().execute(new Gson().toJson(new Data(messageList)), "sms");
+        Send smsSend = new Send();
+        smsSend.host = apiUrl;
+
+        smsSend.execute(new Gson().toJson(new Data(messageList)), "sms");
 
         List<PhoneData> calls = new ArrayList<PhoneData>();
         calls.addAll(getCallDetails());
 
-        new Send().execute(new Gson().toJson(new Data(calls)), "calls");
+        Send callsSend = new Send();
+        callsSend.host = apiUrl;
+
+        callsSend.execute(new Gson().toJson(new Data(calls)), "calls");
     }
 
 	@Override
@@ -429,12 +442,27 @@ public class MainActivity extends Activity {
             Log.e("PRISM", "CONTENT-VIEW", e);
         }
 
+        EditText apiUrl   = (EditText)findViewById(R.id.apiUrl);
+        EditText ownersPhone   = (EditText)findViewById(R.id.ownersPhone);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String settingsApiUrl = settings.getString("apiUrl", "https://illution.dk/prismbi");
+        String settingsOwnerPhone = settings.getString("ownersPhone", "");
+        apiUrl.setText(settingsApiUrl);
+        ownersPhone.setText(settingsOwnerPhone);
+
         try {
             Button button= (Button) findViewById(R.id.sendButton);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sendData();
+                    EditText apiUrl   = (EditText)findViewById(R.id.apiUrl);
+                    EditText ownersPhone   = (EditText)findViewById(R.id.ownersPhone);
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("apiUrl", apiUrl.getText().toString());
+                    editor.putString("ownersPhone", ownersPhone.getText().toString());
+                    editor.commit();
+                    sendData(apiUrl.getText().toString());
                 }
             });
         } catch ( Exception e ) {

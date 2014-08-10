@@ -10,6 +10,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 public class Send extends AsyncTask<String, Void, String> {
+    public String host = "";
+
     protected String doInBackground (String... params ) {
         StringEntity entity = null;
         try {
@@ -21,7 +23,7 @@ public class Send extends AsyncTask<String, Void, String> {
         entity.setContentType("application/json");
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://192.168.1.52:8080/"+params[1]);
+        HttpPost httppost = new HttpPost(this.host+"/"+params[1]);
 
         try {
             // Add your data
